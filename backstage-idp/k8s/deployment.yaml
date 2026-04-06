@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  namespace: default
+  labels:
+    app: backstage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage
+  template:
+    metadata:
+      labels:
+        app: backstage
+    spec:
+      containers:
+        - name: backstage
+          # Replace with your actual ECR image URL after pushing
+          image: 123456789.dkr.ecr.us-east-1.amazonaws.com/backstage:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7007
+          # Load app-config.yaml from ConfigMap (see configmap.yaml)
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/app-config.production.yaml
+              subPath: app-config.production.yaml
+          # Load secrets from Kubernetes Secret (see secret.yaml)
+          env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: github-token
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-secrets
+                  key: aws-secret-access-key
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: backstage-config

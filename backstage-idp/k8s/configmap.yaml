@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backstage-config
+  namespace: default
+data:
+  # This injects app-config.production.yaml into the running pod.
+  # Environment variables (GITHUB_TOKEN etc.) are injected via Secret, not here.
+  app-config.production.yaml: |
+    app:
+      baseUrl: http://${EC2_PUBLIC_IP}:3000
+
+    backend:
+      baseUrl: http://${EC2_PUBLIC_IP}:7007
+      listen:
+        port: 7007
+      database:
+        client: better-sqlite3
+        connection: ':memory:'
+
+    integrations:
+      github:
+        - host: github.com
+          token: ${GITHUB_TOKEN}

@@ -1,0 +1,17 @@
+app:
+  baseUrl: http://${EC2_PUBLIC_IP}:3000
+
+backend:
+  baseUrl: http://${EC2_PUBLIC_IP}:7007
+  listen:
+    port: 7007
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+
+# In production, secrets are injected via Kubernetes Secrets
+# and read as environment variables — never hardcoded here.
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}

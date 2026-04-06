@@ -1,0 +1,42 @@
+app:
+  title: My Backstage IDP
+  baseUrl: http://localhost:3000
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}   # Set this in your .env file
+
+auth:
+  providers: {}
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location, Template]
+  locations:
+    - type: file
+      target: ../../catalog-info.yaml
+
+scaffolder:
+  # Backstage Software Templates live here
+  defaultAuthor:
+    name: Backstage
+    email: backstage@example.com
+
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'local'
+  publisher:
+    type: 'local'

@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-idp
+  description: Internal Developer Platform powered by Spotify Backstage
+  annotations:
+    github.com/project-slug: your-org/backstage-idp
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: website
+  lifecycle: production
+  owner: platform-team

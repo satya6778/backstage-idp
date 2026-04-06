@@ -1,0 +1,60 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: provision-s3-bucket
+  title: Provision an AWS S3 Bucket
+  description: >
+    Self-service template: fill in the form and Backstage will trigger
+    Terraform via GitHub Actions to create a secure, versioned S3 bucket.
+  tags:
+    - aws
+    - s3
+    - infrastructure
+    - terraform
+spec:
+  owner: platform-team
+  type: infrastructure
+
+  # ── Form fields shown to the developer in the Backstage UI ────────────────
+  parameters:
+    - title: Bucket Details
+      required:
+        - bucketName
+        - environment
+      properties:
+        bucketName:
+          title: S3 Bucket Name
+          type: string
+          description: >
+            A short, lowercase name for your bucket.
+            The environment (dev/staging/prod) is added automatically.
+          pattern: '^[a-z0-9-]+$'
+        environment:
+          title: Environment
+          type: string
+          enum:
+            - dev
+            - staging
+            - prod
+          default: dev
+
+  # ── Actions that run after the developer submits the form ─────────────────
+  steps:
+    - id: trigger-github-action
+      name: Trigger Terraform via GitHub Actions
+      action: github:actions:dispatch
+      input:
+        repoUrl: github.com?repo=backstage-idp&owner=your-org
+        workflowId: provision-s3.yaml
+        branchOrTagName: main
+        workflowInputs:
+          bucket_name: ${{ parameters.bucketName }}
+          environment: ${{ parameters.environment }}
+
+  # ── Links shown to the developer after provisioning completes ─────────────
+  output:
+    links:
+      - title: View GitHub Actions run
+        url: https://github.com/your-org/backstage-idp/actions/workflows/provision-s3.yaml
+      - title: View bucket in AWS Console
+        url: https://s3.console.aws.amazon.com/s3/buckets/${{ parameters.bucketName }}-${{ parameters.environment }}
